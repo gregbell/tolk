@@ -6,7 +6,19 @@
   <link rel="alternate" type="application/rss+xml" title="RSS" href="<%= tolk_locale_path(@locale, :format => 'atom') -%>" />
 <% end %>
 
-<h3 class="switch">Phrases missing translation (<%= @locale.count_phrases_without_translation %>) <span>(<%= link_to 'See completed translations', all_tolk_locale_path(@locale) %>)</span></h3>
+<div id="locale-nav">
+  <%= link_to "All Translations", tolk_locale_path(@locale, :filter => Tolk::Locale::ALL), :class => (@filter_by == Tolk::Locale::ALL ? 'current' : nil) %>
+  <span class="count">(<%= Tolk::Phrase.count %>)</span>
+  <span class="divider">|</span>
+
+  <%= link_to "Missing Translations", tolk_locale_path(@locale, :filter => Tolk::Locale::MISSING), :class => (@filter_by == Tolk::Locale::MISSING ? 'current' : nil) %>
+  <span class="count">(<%= @locale.count_phrases_without_translation %>)</span>
+  <span class="divider">|</span>
+
+
+  <%= link_to "Completed Translations", tolk_locale_path(@locale, :filter => Tolk::Locale::COMPLETED), :class => (@filter_by == Tolk::Locale::COMPLETED ? 'current' : nil) %>
+  <span class="count">(<%= @locale.translations.count %>)</span>
+</div>
 
 <% if @locale.has_updated_translations? && action_name != 'updated' %>
   <span class="notice">Some phrases have changed. <%= link_to "Update translations", updated_tolk_locale_path(@locale) %>.</span>
@@ -18,7 +30,6 @@
 
 <div class="translations">
   <% if @phrases.any? %>
-     <% form_for @locale do |locale_form| %>
       <table class="translations">
         <tr>
           <th class="translation"><%= @locale.language_name -%></th>
@@ -26,12 +37,9 @@
         </tr>
         <% @phrases.each do |phrase| %>
           <tr>
-            <% translation = Tolk::Translation.new(:locale => @locale, :phrase => phrase) %>
+            <% translation = Tolk::Translation.find_or_initialize_by_locale_id_and_phrase_id(@locale.id, phrase.id) %>
             <td class="translation">
-              <%= hidden_field_tag :"translations[][id]", translation.id, :id => "#{translation.object_id}_id" %>
-              <%= hidden_field_tag :"translations[][phrase_id]", phrase.id, :id => "#{translation.object_id}_phrase_id" %>
-              <%= hidden_field_tag :"translations[][locale_id]", translation.locale_id, :id => "#{translation.object_id}_locale_id" %>
-              <%= text_area_tag :"translations[][text]", format_i18n_text_area_value(translation.text), :class => "locale", :id => "#{translation.object_id}_text", :onfocus => "$(this).up('tr').addClassName('active');", :onblur => "$(this).up('tr').removeClassName('active');" %>
+              <%= render :partial => 'tolk/translations/translation', :locals => { :translation => translation } %>
             </td>
             <td class="phrase">
               <% if params[:q].present? -%>
@@ -44,9 +52,6 @@
           </tr>
         <% end %>
       </table>
-      <div class="table_submit">
-        <p><%= locale_form.submit "Save changes" %></p>
-      </div>
     <% end %>
     <div class="paginate">
       <%= will_paginate @phrases, :renderer => Tolk::LinkRenderer %>
@@ -54,5 +59,4 @@
   <% else %>
     <p style="text-align: left">There aren't any missing or updated phrases that need translation.</p>
     <p>&nbsp;</p>
-  <% end %>
 </div>

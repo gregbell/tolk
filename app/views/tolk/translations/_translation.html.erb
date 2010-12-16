@@ -1,0 +1,11 @@
+<% form_for translation, :html => { :onsubmit => "Tolk.saveTranslation($(this)); return false;", :class => translation.errors.any? ? "error" : nil } do |f| %>
+  <%= f.error_message_on(:text) %> 
+  <%= f.hidden_field :phrase_id, :id => "#{translation.object_id}_phrase_id" %>
+  <%= f.hidden_field :locale_id,  :id => "#{translation.object_id}_locale_id" %>
+  <%= text_area_tag :"tolk_translation[text]", format_i18n_text_area_value(translation.text), 
+    :class => "locale", 
+    :id => "#{translation.object_id}_text", 
+    :onfocus => "$(this).up('tr').addClassName('active');", 
+    :onblur => "if($(this).value == '#{format_i18n_text_area_value(translation.text).try(:gsub, "'","\\'")}' && !$(this).up('form').hasClassName('error')){ $(this).up('tr').removeClassName('active') }" %>
+  <%= submit_tag "Save Changes" %>
+<% end %>

@@ -2,6 +2,13 @@ module Tolk
   class Locale < ActiveRecord::Base
     set_table_name "tolk_locales"
 
+    # Filters
+    ALL       = 'all'
+    MISSING   = 'missing'
+    COMPLETED = 'completed'
+    FILTERS = [ALL, MISSING, COMPLETED]
+
+
     MAPPING = {
       'ar'    => 'Arabic',
       'bs'    => 'Bosnian',

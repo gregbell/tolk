@@ -34,29 +34,4 @@ class TranslationProcessTest < ActionController::IntegrationTest
     assert_equal 'Arrrr!', locale.translations(true).first.text
   end
 
-  private
-
-  def add_locale(name)
-    visit tolk_root_path
-    select name
-    click_button 'Add'
-
-    Tolk::Locale.find_by_name!(Tolk::Locale::MAPPING.index(name))
-  end
-
-  def setup_locales
-    Tolk::Locale.delete_all
-    Tolk::Translation.delete_all
-    Tolk::Phrase.delete_all
-
-    Tolk::Locale.locales_config_path = File.join(Rails.root, "test/locales/sync/")
-
-    I18n.backend.reload!
-    I18n.load_path = [Tolk::Locale.locales_config_path + 'en.yml']
-    I18n.backend.send :init_translations
-
-    Tolk::Locale.primary_locale(true)
-
-    Tolk::Locale.sync!
-  end
 end

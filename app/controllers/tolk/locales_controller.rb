@@ -8,13 +8,24 @@ module Tolk
     end
   
     def show
+      @filter_by = resolve_submitted_filter
+      @phrases = case @filter_by
+                 when Tolk::Locale::ALL
+                  Tolk::Phrase.paginate(:page => params[:page] || 1, :order => "key ASC")
+                 when Tolk::Locale::MISSING
+                  @locale.phrases_without_translation(params[:page])
+                 when Tolk::Locale::COMPLETED
+                  @locale.phrases_with_translation(params[:page])
+                 end
       respond_to do |format|
-        format.html do
-          @phrases = @locale.phrases_without_translation(params[:page])
-        end
+        format.html 
         format.atom { @phrases = @locale.phrases_without_translation(params[:page], :per_page => 50) }
         format.yml { render :text => @locale.to_hash.ya2yaml(:syck_compatible => true) }
       end
+    end
+
+    def resolve_submitted_filter
+      Tolk::Locale::FILTERS.include?(params[:filter]) ? params[:filter] : Tolk::Locale::ALL
     end
 
     def update

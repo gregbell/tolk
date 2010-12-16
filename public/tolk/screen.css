@@ -333,3 +333,14 @@ div.paginate .disabled {
   color: #ccc;
   border-color: #eee;
 }
+
+div#locale-nav { margin: 15px 0 15px 0; font-size: 1.0em; float: left; }
+div#locale-nav .divider { color: #ccc; padding: 0 5px; }
+div#locale-nav .count { color: #aaa; font-size: 0.8em; }
+div#locale-nav a.current { text-decoration: none; color: #111; font-weight: bold;}
+div.search { float: right; margin-top: 15px; }
+
+td.translation { text-align: left; }
+td.translation input[type=submit] { margin-top: 10px; display: none; }
+tr.active td.translation input[type=submit] { display: inline; }
+.formError { color: red; }
